@@ -1,0 +1,10 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { PageInfo } from "../components/PageInfo";
+---
+
+<Layout title="Welcome to Astro.">
+    <main>
+        <PageInfo client:only="react" />
+    </main>
+</Layout>
