@@ -7,11 +7,11 @@ const assistant = new OpenAI({
   apiKey: import.meta.env.OPENAI_API_KEY,
 })
 
-const extractDataToPush = (chunk: OpenAI.Beta.Assistants.AssistantStreamEvent): ThreadMessageDeltaEvent | ThreadMessageCompletedEvent | undefined => {
-  if (chunk.event === 'thread.message.delta' && Array.isArray(chunk.data.delta.content)) {
-    const [content] = chunk.data.delta.content
+const extractDataToPush = ({ event, data }: OpenAI.Beta.Assistants.AssistantStreamEvent): ThreadMessageDeltaEvent | ThreadMessageCompletedEvent | undefined => {
+  if (event === 'thread.message.delta' && data.delta.content) {
+    const [content] = data.delta.content
 
-    if (content.type === 'text' && content.text?.value) {
+    if (content?.type === 'text' && content.text?.value) {
       return {
         type: 'thread.message.delta',
         payload: content.text.value,
@@ -19,10 +19,10 @@ const extractDataToPush = (chunk: OpenAI.Beta.Assistants.AssistantStreamEvent): 
     }
   }
 
-  if (chunk.event === 'thread.message.completed' && Array.isArray(chunk.data.content)) {
-    const [content] = chunk.data.content
+  if (event === 'thread.message.completed') {
+    const [content] = data.content
 
-    if (content.type === 'text' && content.text.value) {
+    if (content?.type === 'text' && content.text.value) {
       return {
         type: 'thread.message.completed',
         payload: `${content.text.value}\n`,
